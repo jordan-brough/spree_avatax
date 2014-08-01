@@ -25,7 +25,6 @@ SpreeAvatax::Config.username = 'YOUR USERNAME'
 SpreeAvatax::Config.password = 'YOUR PASSWORD'
 SpreeAvatax::Config.company_code = 'YOUR COMPANY'
 SpreeAvatax::Config.endpoint = 'PROD OR DEV ENDPOINT'
-SpreeAvatax::Config.suppress_api_errors = true/false
 ```
 
 It is left to for you to decide how this gets set, either as an environment initializer or via a Spree preference.

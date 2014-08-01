@@ -60,7 +60,8 @@ RSpec.configure do |config|
   config.include Spree::TestingSupport::UrlHelpers
 
   config.include ActionView::Helpers::TagHelper
-  config.include ActionView::Context 
+  config.include ActionView::Context
+  config.include AvataxSoapResponses
 
   # == Mock Framework
   #
