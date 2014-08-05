@@ -1,4 +1,4 @@
-require 'Avatax_TaxService'
+require 'avatax_taxservice'
 
 class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
   DOC_TYPE = 'ReturnInvoice'
