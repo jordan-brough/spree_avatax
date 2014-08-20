@@ -48,14 +48,17 @@ describe SpreeAvatax::ReturnInvoice do
 
     let(:expected_tax_override_date) { Date.today }
     let(:expected_truncated_description) { return_item.inventory_unit.line_item.variant.product.description[0...100] }
+    let(:gettax_response) { return_invoice_gettax_response(reimbursement.number, return_item.id) }
+    let(:gettax_response_return_item_tax_line) { Array.wrap(gettax_response[:tax_lines][:tax_line]).first }
+    let(:return_item_calculated_tax) do
+      BigDecimal.new(gettax_response_return_item_tax_line[:tax]).abs
+    end
 
     before do
       SpreeAvatax::ReturnInvoice.send(:tax_svc)
         .should_receive(:gettax)
         .with(expected_gettax_params)
-        .and_return(
-          return_invoice_gettax_response(reimbursement.number)
-        )
+        .and_return(gettax_response)
     end
 
     subject do
@@ -67,6 +70,24 @@ describe SpreeAvatax::ReturnInvoice do
         subject
       }.to change { SpreeAvatax::ReturnInvoice.count }.by(1)
       expect(reimbursement.return_invoice).to eq SpreeAvatax::ReturnInvoice.last
+    end
+
+    it 'persists the results to the return items' do
+      expect {
+        subject
+      }.to change { return_item.reload.additional_tax_total }.from(0).to(return_item_calculated_tax)
+    end
+
+    context 'when the response for a return item is missing' do
+      before do
+        gettax_response_return_item_tax_line[:no] = (return_item.id + 1).to_s
+      end
+
+      it 'raises ReturnItemResponseMissing' do
+        expect {
+          subject
+        }.to raise_error(SpreeAvatax::ReturnInvoice::ReturnItemResponseMissing)
+      end
     end
 
     context 'when an invoice already exists' do

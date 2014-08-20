@@ -1,5 +1,5 @@
 module AvataxSoapResponses
-  def return_invoice_gettax_response(doc_code, time = Time.now)
+  def return_invoice_gettax_response(doc_code, return_item_id, time = Time.now)
     {
       transaction_id: "4289094359310439",
       result_code: "Success",
@@ -19,7 +19,7 @@ module AvataxSoapResponses
       hash_code: "0",
       tax_lines: {
         tax_line: {
-          no: "1",
+          no: return_item_id.to_s,
           tax_code: "P0000000",
           taxability: true,
           boundary_level: "Zip5",
@@ -27,8 +27,8 @@ module AvataxSoapResponses
           discount: "0",
           taxable: "0",
           rate: "0",
-          tax: "0",
-          tax_calculated: "0",
+          tax: "-0.01",
+          tax_calculated: "-0.01",
           tax_included: false,
           tax_details: {
             tax_detail: {
@@ -40,8 +40,8 @@ module AvataxSoapResponses
               base: "0",
               taxable: "0",
               rate: "0",
-              tax: "0",
-              tax_calculated: "0",
+              tax: "-0.01",
+              tax_calculated: "-0.01",
               non_taxable: "-10",
               exemption: "0",
               juris_name: "ALABAMA",

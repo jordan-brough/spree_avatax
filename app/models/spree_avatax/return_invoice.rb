@@ -13,6 +13,7 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
 
   class AvataxApiError < StandardError; end
   class AlreadyCommittedError < StandardError; end
+  class ReturnItemResponseMissing < StandardError; end
 
   class_attribute :avatax_logger
   self.avatax_logger = Logger.new(Rails.root.join('log/avatax.log'))
@@ -43,6 +44,25 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
         else
           reimbursement.return_invoice.destroy
         end
+      end
+
+      # Array.wrap required because the XML engine the Avatax gem uses turns child nodes into
+      #   {...} instead of [{...}] when there is only one child.
+      tax_lines = Array.wrap(success_result[:tax_lines][:tax_line])
+
+      reimbursement.return_items.each do |return_item|
+        tax_line = tax_lines.detect { |l| l[:no] == return_item.id.to_s }
+
+        if tax_line.nil?
+          Rails.logger.error("missing return item #{return_item.id} in avatax response: #{success_result.inspect}")
+          raise ReturnItemResponseMissing.new("couldn't find return item #{return_item.id} in avatax response")
+        end
+
+        tax = BigDecimal.new(tax_line[:tax]).abs
+
+        return_item.update_attributes!({
+          additional_tax_total: tax
+        })
       end
 
       reimbursement.create_return_invoice!({
