@@ -56,8 +56,8 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
         raise
       end
     ensure
-      duration = Time.now - bench_start
-      Rails.logger.info "avatax_sales_invoice_generate_duration=#{duration}"
+      duration = (Time.now - bench_start).round
+      Rails.logger.info "avatax_sales_invoice_generate_duration=#{(duration*1000).round}"
     end
 
     def commit(order)

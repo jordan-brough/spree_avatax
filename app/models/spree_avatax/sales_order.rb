@@ -44,7 +44,7 @@ class SpreeAvatax::SalesOrder < ActiveRecord::Base
       end
     ensure
       duration = Time.now - bench_start
-      Rails.logger.info "avatax_sales_order_generate_duration=#{duration}"
+      Rails.logger.info "avatax_sales_order_generate_duration=#{(duration*1000).round}"
     end
   end
 end

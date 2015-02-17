@@ -201,7 +201,7 @@ module SpreeAvatax::SalesShared
       order.save!
     ensure
       duration = Time.now - bench_start
-      Rails.logger.info "avatax_reset_tax_attributes_duration=#{duration}"
+      Rails.logger.info "avatax_reset_tax_attributes_duration=#{(duration*1000).round}"
     end
   end
 end
